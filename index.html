@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fractal Diff: Ensemble Model Analysis</title>
+    <script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div class="container">
+        <header>
+            <h1>Fractal Diff Forecast Analysis</h1>
+            <p class="subtitle">Feature Engineering and Optimization on Ensemble Learning Model</p>
+        </header>
+
+        <div class="upload-zone" id="drop-zone">
+            <div class="upload-content">
+                <svg width="50" height="50" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                    <polyline points="17 8 12 3 7 8"></polyline>
+                    <line x1="12" y1="3" x2="12" y2="15"></line>
+                </svg>
+                <h3>Upload Research Data</h3>
+                <p>Drag & Drop <code>wave_predictions_no_leakage.csv</code> and <code>feature_importance_wave_no_leakage.csv</code> here</p>
+                <input type="file" id="file-input" multiple accept=".csv" style="display:none">
+                <button onclick="document.getElementById('file-input').click()">Browse Files</button>
+            </div>
+        </div>
+
+        <div id="dashboard" class="dashboard-grid" style="display: none;">
+            
+            <div class="card metrics-panel">
+                <div class="metric-box">
+                    <span class="label">MAE</span>
+                    <span class="value" id="metric-mae">--</span>
+                </div>
+                <div class="metric-box">
+                    <span class="label">RMSE</span>
+                    <span class="value" id="metric-rmse">--</span>
+                </div>
+                <div class="metric-box">
+                    <span class="label">R² Score</span>
+                    <span class="value" id="metric-r2">--</span>
+                </div>
+                <div class="metric-box">
+                    <span class="label">Coverage (80% PI)</span>
+                    <span class="value" id="metric-cov">--</span>
+                </div>
+            </div>
+
+            <div class="card full-width">
+                <h3>Fractal Diff Forecast vs Actual (24h Horizon)</h3>
+                <div id="chart-main" class="chart-container"></div>
+            </div>
+
+            <div class="card">
+                <h3>Error Distribution (Residuals)</h3>
+                <div id="chart-residuals" class="chart-container"></div>
+            </div>
+
+            <div class="card">
+                <h3>Top Feature Importance</h3>
+                <div id="chart-features" class="chart-container"></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
