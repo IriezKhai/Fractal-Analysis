@@ -1,44 +1,113 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>FracDiff Forecast Dashboard</title>
-  <link rel="stylesheet" href="styles.css">
-  <script src="https://cdn.plot.ly/plotly-2.30.0.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fractal Diff Intelligence | Ensemble Model</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Roboto+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+    <link rel="stylesheet" href="style.css">
 </head>
-
 <body>
-<header>
-  <h1>📊 Fractal Diff Forecast Dashboard</h1>
-  <p>LightGBM Quantile Forecasting · No Leakage · Rolling Windows</p>
-</header>
 
-<section class="controls">
-  <label>Time Window:</label>
-  <select id="windowSelect">
-    <option value="168">Last 7 Days</option>
-    <option value="336">Last 14 Days</option>
-    <option value="720">Last 30 Days</option>
-    <option value="all">All</option>
-  </select>
-</section>
+    <div class="dashboard-container">
+        <aside class="sidebar">
+            <div class="brand">
+                <h1>FRACTAL<span class="highlight">.AI</span></h1>
+                <p>Ensemble Learning Terminal</p>
+            </div>
 
-<section class="grid">
-  <div id="tsChart" class="card"></div>
-  <div id="residualChart" class="card"></div>
-  <div id="scatterChart" class="card"></div>
-  <div id="coverageChart" class="card"></div>
-  <div id="widthChart" class="card"></div>
-  <div id="baselineChart" class="card"></div>
-  <div id="featureChart" class="card wide"></div>
-</section>
+            <div class="control-group">
+                <h3>DATA INGESTION</h3>
+                <p class="helper-text">Upload 'wave_predictions_no_leakage.csv'</p>
+                <input type="file" id="predFile" accept=".csv" class="file-input">
+                
+                <p class="helper-text">Upload 'feature_importance...csv' (Optional)</p>
+                <input type="file" id="featFile" accept=".csv" class="file-input">
+                
+                <button id="processBtn" class="action-btn">INITIALIZE ANALYTICS</button>
+            </div>
 
-<footer>
-  <p>Generated from FracDiff Forecasting Pipeline · GitHub Pages Ready</p>
-</footer>
+            <div class="kpi-panel">
+                <h3>LIVE METRICS</h3>
+                <div class="kpi-card">
+                    <span class="label">MODEL MAE</span>
+                    <span class="value" id="kpi-mae">--</span>
+                </div>
+                <div class="kpi-card">
+                    <span class="label">R² SCORE</span>
+                    <span class="value" id="kpi-r2">--</span>
+                </div>
+                <div class="kpi-card">
+                    <span class="label">PICP (Cov.)</span>
+                    <span class="value" id="kpi-picp">--</span>
+                </div>
+                <div class="kpi-card">
+                    <span class="label">LATEST PRED</span>
+                    <span class="value" id="kpi-last">--</span>
+                </div>
+            </div>
 
-<script src="app.js"></script>
+            <div class="status-log" id="statusLog">
+                <p>> System Ready.</p>
+                <p>> Waiting for data stream...</p>
+            </div>
+        </aside>
+
+        <main class="main-grid">
+            <header>
+                <h2>MARKET REGRESSION ANALYSIS: FRACTAL DIFF (H=24)</h2>
+                <div class="date-display" id="dateDisplay">TIME: --:--:--</div>
+            </header>
+
+            <div class="charts-wrapper">
+                
+                <div class="chart-card full-width">
+                    <div class="card-header">
+                        <h3>01. FORECAST vs ACTUAL (WITH CONFIDENCE INTERVALS)</h3>
+                        <span class="ticker">TGT: FRAC_DIFF</span>
+                    </div>
+                    <div id="mainForecastChart" class="chart-canvas"></div>
+                </div>
+
+                <div class="chart-card">
+                    <div class="card-header"><h3>02. RESIDUAL DISTRIBUTION</h3></div>
+                    <div id="residualDistChart" class="chart-canvas"></div>
+                </div>
+                <div class="chart-card">
+                    <div class="card-header"><h3>03. ACTUAL VS PREDICTED SCATTER</h3></div>
+                    <div id="actVsPredChart" class="chart-canvas"></div>
+                </div>
+                <div class="chart-card">
+                    <div class="card-header"><h3>04. PREDICTION INTERVAL WIDTH</h3></div>
+                    <div id="widthChart" class="chart-canvas"></div>
+                </div>
+
+                <div class="chart-card full-width">
+                    <div class="card-header"><h3>05. ROLLING COVERAGE PROBABILITY (TARGET 80%)</h3></div>
+                    <div id="coverageChart" class="chart-canvas"></div>
+                </div>
+
+                <div class="chart-card tall">
+                    <div class="card-header"><h3>06. TOP 20 FEATURE IMPORTANCE</h3></div>
+                    <div id="featureChart" class="chart-canvas"></div>
+                </div>
+
+                <div class="chart-card">
+                    <div class="card-header"><h3>07. Q-Q PLOT (NORMALITY)</h3></div>
+                    <div id="qqChart" class="chart-canvas"></div>
+                </div>
+                
+                 <div class="chart-card">
+                    <div class="card-header"><h3>08. CUMULATIVE ABSOLUTE ERROR</h3></div>
+                    <div id="cumErrorChart" class="chart-canvas"></div>
+                </div>
+
+            </div>
+        </main>
+    </div>
+    <script src="app.js"></script>
 </body>
 </html>
 
