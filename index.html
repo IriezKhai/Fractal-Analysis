@@ -3,145 +3,186 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fractal Diff: Advanced Analytics</title>
-    <script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+    <title>Fractal Diff AI Dashboard</title>
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script src="https://cdn.plot.ly/plotly-2.24.1.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 </head>
-<body>
+<body class="bg-dark text-light">
 
-    <div class="app-container">
-        <nav class="sidebar">
-            <div class="brand">
-                <h2>Fractal<span>AI</span></h2>
-            </div>
-            <ul class="nav-links">
-                <li class="active" onclick="switchPage('overview')">
-                    <i class="fas fa-chart-line"></i> Overview
-                </li>
-                <li onclick="switchPage('comparison')">
-                    <i class="fas fa-balance-scale"></i> Model Battle
-                </li>
-                <li onclick="switchPage('diagnostics')">
-                    <i class="fas fa-microscope"></i> Diagnostics
-                </li>
-                <li onclick="switchPage('data')">
-                    <i class="fas fa-table"></i> Data View
-                </li>
-            </ul>
-        </nav>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-black border-bottom border-secondary">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">
+                <span class="text-primary">⚡</span> Fractal Diff <strong>Ensemble Analytics</strong>
+            </a>
+            <span class="navbar-text text-muted" id="last-update">
+                Model: LightGBM Quantile Regressor
+            </span>
+        </div>
+    </nav>
 
-        <main class="content">
-            
-            <header id="upload-header">
-                <div class="upload-controls">
-                    <p>Required: <code>predictions.csv</code>, <code>baselines.csv</code>, <code>features.csv</code></p>
-                    <input type="file" id="file-input" multiple accept=".csv" />
-                    <label for="file-input" class="upload-btn">
-                        <i class="fas fa-cloud-upload-alt"></i> Upload All CSVs
-                    </label>
-                    <span id="status-text">Waiting for files...</span>
-                </div>
-            </header>
-
-            <div id="page-overview" class="page-section active">
-                <h1>Executive Summary</h1>
-                <div class="metrics-panel">
-                    <div class="metric-box highlight">
-                        <span class="label">Best Model MAE</span>
-                        <span class="value" id="metric-mae">--</span>
-                    </div>
-                    <div class="metric-box">
-                        <span class="label">RMSE</span>
-                        <span class="value" id="metric-rmse">--</span>
-                    </div>
-                    <div class="metric-box">
-                        <span class="label">R² Score</span>
-                        <span class="value" id="metric-r2">--</span>
-                    </div>
-                    <div class="metric-box">
-                        <span class="label">Directional Acc.</span>
-                        <span class="value" id="metric-dir">--</span>
-                    </div>
-                </div>
-
-                <div class="dashboard-grid">
-                    <div class="card full-width">
-                        <h3>Fractal Diff Forecast (LightGBM vs Actual)</h3>
-                        <div id="chart-main" class="chart-container"></div>
-                    </div>
-                    <div class="card">
-                        <h3>Top 15 Feature Importance</h3>
-                        <div id="chart-features" class="chart-container"></div>
-                    </div>
-                    <div class="card">
-                        <h3>Prediction Interval Coverage (Rolling)</h3>
-                        <div id="chart-coverage" class="chart-container"></div>
+    <div class="container-fluid py-4">
+        
+        <div class="row g-3 mb-4">
+            <div class="col-md-3">
+                <div class="card bg-gray border-0 h-100">
+                    <div class="card-body text-center">
+                        <h6 class="text-muted">Mean Absolute Error</h6>
+                        <h2 class="text-primary" id="kpi-mae">--</h2>
                     </div>
                 </div>
             </div>
-
-            <div id="page-comparison" class="page-section" style="display:none;">
-                <h1>Model Comparison & Baselines</h1>
-                
-                <div class="dashboard-grid">
-                    <div class="card full-width">
-                        <h3>🏆 Model Leaderboard</h3>
-                        <div class="table-container">
-                            <table id="leaderboard-table">
-                                <thead>
-                                    <tr>
-                                        <th>Rank</th>
-                                        <th>Model Name</th>
-                                        <th>MAE</th>
-                                        <th>RMSE</th>
-                                        <th>vs. Baseline (%)</th>
-                                    </tr>
-                                </thead>
-                                <tbody></tbody>
-                            </table>
-                        </div>
-                    </div>
-
-                    <div class="card full-width">
-                        <h3>Cumulative Squared Error (Lower is Better)</h3>
-                        <p class="subtitle">See where models fail over time</p>
-                        <div id="chart-cumulative" class="chart-container"></div>
+            <div class="col-md-3">
+                <div class="card bg-gray border-0 h-100">
+                    <div class="card-body text-center">
+                        <h6 class="text-muted">RMSE</h6>
+                        <h2 class="text-info" id="kpi-rmse">--</h2>
                     </div>
                 </div>
             </div>
-
-            <div id="page-diagnostics" class="page-section" style="display:none;">
-                <h1>Deep Diagnostics</h1>
-                <div class="dashboard-grid">
-                    <div class="card">
-                        <h3>Predicted vs Actual (Scatter)</h3>
-                        <div id="chart-scatter" class="chart-container"></div>
-                    </div>
-                    <div class="card">
-                        <h3>Residual Distribution (Gaussian Fit)</h3>
-                        <div id="chart-residuals" class="chart-container"></div>
-                    </div>
-                    <div class="card full-width">
-                        <h3>Error Volatility (Rolling MAE)</h3>
-                        <div id="chart-rolling-error" class="chart-container"></div>
+            <div class="col-md-3">
+                <div class="card bg-gray border-0 h-100">
+                    <div class="card-body text-center">
+                        <h6 class="text-muted">Confidence Interval Coverage</h6>
+                        <h2 class="text-success" id="kpi-cov">--%</h2>
+                        <small>Target: 80%</small>
                     </div>
                 </div>
             </div>
-
-            <div id="page-data" class="page-section" style="display:none;">
-                <h1>Raw Data View</h1>
-                <div class="card full-width">
-                    <div class="table-container" style="max-height: 70vh;">
-                        <table id="raw-data-table"></table>
+            <div class="col-md-3">
+                <div class="card bg-gray border-0 h-100">
+                    <div class="card-body text-center">
+                        <h6 class="text-muted">Total Samples Evaluated</h6>
+                        <h2 class="text-warning" id="kpi-samples">--</h2>
                     </div>
                 </div>
             </div>
+        </div>
 
-        </main>
+        <div class="row g-3 mb-4">
+            <div class="col-lg-8">
+                <div class="card bg-gray border-0 shadow-sm">
+                    <div class="card-header bg-transparent border-0">
+                        <h5>1. Fractal Forecast (with Uncertainty Bounds)</h5>
+                    </div>
+                    <div class="card-body">
+                        <div id="chart-main" style="height: 400px;"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4">
+                <div class="card bg-gray border-0 shadow-sm">
+                    <div class="card-header bg-transparent border-0">
+                        <h5>2. Error Distribution</h5>
+                    </div>
+                    <div class="card-body">
+                        <div id="chart-resid-hist" style="height: 400px;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row g-3 mb-4">
+            <div class="col-md-4">
+                <div class="card bg-gray border-0">
+                    <div class="card-body">
+                        <h5>3. Pred vs Actual</h5>
+                        <div id="chart-scatter" style="height: 300px;"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card bg-gray border-0">
+                    <div class="card-body">
+                        <h5>4. Feature Importance (Top 20)</h5>
+                        <div id="chart-features" style="height: 300px;"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card bg-gray border-0">
+                    <div class="card-body">
+                        <h5>5. Model Benchmark (MAE)</h5>
+                        <div id="chart-baseline" style="height: 300px;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <h5 class="mb-3 text-primary border-bottom border-secondary pb-2">Advanced Diagnostics</h5>
+        <div class="row g-3">
+            <div class="col-md-4">
+                <div class="card bg-gray border-0">
+                    <div class="card-body">
+                        <h6>6. Residuals over Time</h6>
+                        <div id="chart-resid-time" style="height: 250px;"></div>
+                    </div>
+                </div>
+            </div>
+             <div class="col-md-4">
+                <div class="card bg-gray border-0">
+                    <div class="card-body">
+                        <h6>7. Heteroscedasticity (Error vs Pred)</h6>
+                        <div id="chart-hetero" style="height: 250px;"></div>
+                    </div>
+                </div>
+            </div>
+             <div class="col-md-4">
+                <div class="card bg-gray border-0">
+                    <div class="card-body">
+                        <h6>8. Prediction Interval Width</h6>
+                        <div id="chart-width" style="height: 250px;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="row mt-3">
+            <div class="col-12">
+                <div class="card bg-gray border-0">
+                    <div class="card-body">
+                        <h6>9. Cumulative Squared Error (Model Stability)</h6>
+                        <div id="chart-cumulative" style="height: 250px;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mt-3 mb-5">
+            <div class="col-12">
+                <div class="card bg-gray border-0">
+                    <div class="card-header">
+                        <h5>10. Recent Prediction Data</h5>
+                    </div>
+                    <div class="card-body table-responsive">
+                        <table class="table table-dark table-sm table-hover" id="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Actual</th>
+                                    <th>Predicted (q50)</th>
+                                    <th>Lower (q10)</th>
+                                    <th>Upper (q90)</th>
+                                    <th>Error</th>
+                                </tr>
+                            </thead>
+                            <tbody id="table-body">
+                                </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
     </div>
 
+    <script src="app.js"></script>
+</body>
+</html>
     <script src="script.js"></script>
 </body>
 </html>
+
